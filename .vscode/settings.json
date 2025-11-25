@@ -1,0 +1,5 @@
+{
+    "C_Cpp.errorSquiggles": "enabled",
+    "C_Cpp.windowsErrorReportingMode": "default",
+    "C_Cpp.loggingLevel": "Warning"
+}

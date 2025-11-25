@@ -1,0 +1,286 @@
+\documentstyle[11pt]{article}
+%\input{definitions}
+
+\renewcommand{\baselinestretch}{1.2}
+\setlength{\topmargin}{-0.25in}
+\setlength{\oddsidemargin}{0.50in}
+\setlength{\textwidth}{5.9in}
+\setlength{\textheight}{8.5in}
+
+\newcommand{\I}{{\bf I}}
+
+%\input{psfig}
+
+\begin{document}
+
+\begin{center}
+{\bf Computer Vision I: Low-Middle Level Vision  Homework Exercise \#1 }  \\ (total 7.5 points)   \\
+Due: October 20, 2025， 11:59 PM.
+\end{center}
+
+
+
+These questions are designed for refreshing  math you learned in calculus and  understanding the topics discussed in class. They are divided into smaller steps for you to walk through.   Each step needs no more than 5 lines of proof, so don't get too complicated.  
+
+{\em Remark. There are 4 questions in total}\\
+
+\noindent{\bf Question 1}. (2 points) This exercise shows that the 1/f-power law
+observed in natural images can be explained by a simple Markov Random Field （MRF） model.
+
+ Let $\I$ be an image  in a continuous 2D plane (It is neat to prove this in continuous form, discrete lattice will be messy), its Fourier
+transform is,
+\[
+      F(\I) = \hat{I}(\xi,\eta) = \int\int \I(x,y) e^{-i2\pi (x \xi +
+      y\eta)} dxdy.
+\]
+$A^2(\xi, \eta) = |\hat{I}(\xi,\eta)|^2$ is the ``power'' of the
+signal at frequency component $(\xi,\eta)$. We consider a MRF model
+with a quadratic potential $H(\I)$.
+\[
+    p(\I)=\frac{1}{Z} e^{-H(\I)}, \quad H(\I)=\beta \int\int
+    (\nabla_x\I(x,y))^2+(\nabla_y\I(x,y))^2 dxdy.
+\]
+where $\nabla_x \I(x,y)=\frac{\partial \I(x,y)}{\partial x}$ and
+$\nabla_y \I(x,y)=\frac{\partial \I(x,y)}{\partial y}$ are the gradient images. For boundary
+condition,  the image $\I(x,y)$ is assumed to have zero intensity at
+infinity or to be defined on a torus.
+
+\begin{enumerate}
+\item Show the Fourier transform of two gradient images
+$\nabla_x\I(x,y)$ and $\nabla_x\I(x,y)$ are $2\pi i \xi \hat{I}$ and
+$2\pi i \eta \hat{I}$ respectively.  That is,
+\[
+   F(\nabla_x\I) = 2\pi i \xi \hat{I}, \quad  F(\nabla_y\I) = 2\pi i \eta \hat{I}.
+\]
+(Hint: this is the so-called Integration by Part in calculus).
+
+\item Show that for any function $g(t)$ and its Fourier transform $G(\xi)$, we have
+\[
+      \int g(t)^2 dt = \int G(\xi)^\ast G(\xi) d\xi
+\]
+$G(\xi)^\ast$ is the conjugate of $G(\xi)$ (as it is a complex number). Intuitively, the Fourier transform does not change the norm of a vector or function. (Hint: The proof involves switching the order of integration variables.)
+
+\item By combining the previous two steps, show
+\[
+       H(\I) = 4 \pi^2 \beta \int\int (\xi^2 + \eta^2)
+       |\hat{I}(\xi,\eta)|^2 d\xi d\eta.
+\]
+What is the mean and variance for each component $\hat{I}(\xi,\eta)$?
+
+{\em Remark: In $\I$, each pixel intensity $\I(x,y)$ is correlated with
+each its neighbours, now in $\hat{I}$, each component $\hat{I}(\xi,\eta)$ is
+independent of other component $\hat{I}(\xi^\prime,\eta^\prime)$. it is like to be diagonalized in discrete covariance matrix in lecture.
+
+Therefore the variance of each Fourier component $\hat{I}(\xi,\eta)$ is
+\[
+  E_p[|\hat{I}(\xi,\eta)|^2] = \frac{C}{\xi^2 + \eta^2}
+\]
+Then  we see that $A(f)$ follows the 1/f law, where $f=\sqrt{\xi^2 +\eta^2}$ is the frequency. 
+}
+
+\item  Derive the constant $C$ above, and prove that the image has constant power $A^2(f)$ at each frequency band $[f, 2f]$, as you observed in project 1.
+Explain in plain language why images in this ensemble have invariant expected power-spectrum over scales
+(frequency bands).
+
+\end{enumerate}
+{\em Remark. This problem shows that the image ensemble defined by the MRF model $p(\I)$ above has exact 1/f power.   As we will show in lecture, it is a maximum entropy probability, it observes the 1/f-law as its sufficient statistics !}
+
+\newpage
+
+
+\noindent{\bf Question 2} (1.5  points). The goal of this exercise is to show the connection between the Gibbs/MRF model and partial differential equations (PDEs) for image processing.   Consider the continuous Gibbs/MRF model for a system in problem 1 again with potential function,
+\[
+    H(\I(x,y)) = \int\int (\nabla_x \I(x,y))^2 + (\nabla_y \I(x,y))^2 dxdy.
+\]
+This is the so-called functional (H is a function of function $\I$, and $\I$ is a function of position $(x,y)$). 
+
+Suppose we minimize the potential $H(\I)$ by gradient descent. The dynamic of the system state is an image sequence $\I(x,y,t)$ showing the state changes over time, 
+\[    \frac{d \I(x,y,t)}{d t } = - \frac{\delta H(\I(x,y,t))}{\delta
+\I)},  \quad \forall x,y.
+\]
+The right side  is the derivative from variational calculus (See hint below).  $t$ is the time step. This leads to a partial differential equations (PDEs) for the system dynamics.
+
+\begin{enumerate}
+\item By variational calculus using the Euler-Lagrange equation,  show
+that the PDE above is the classic {\em heat-diffusion equation}.
+\[
+     \frac{d \I(x,y,t)}{d t} = \Delta \I(x,y), \quad {\rm or} \quad
+     \I_t = \I_{xx}+\I_{yy}.
+\]
+where $\Delta=\frac{\partial^2}{\partial
+x^2}+\frac{\partial^2}{\partial y^2}$ is the Laplacian operator.
+
+\item Rewrite the energy $H(\I)$ in discrete form: replace the integral by summation,
+and the gradients by difference $\nabla_x \I(x,y) = \I(x+1,
+y)-\I(x,y)$. The derive the discrete diffusion equation for updating
+$\I(x,y,t)$ using the conventional gradient descent equation.
+\[   \frac{d \I(x,y,t)}{dt} = - \frac{dH(\I(x,y,t)}{d\I}. \]
+
+This actually should be a discrete form of the heat diffusion equation.
+
+\item Suppose we use periodical boundary condition (torus), what is
+the image $\I(x,y, t)$ as $t \rightarrow \infty$.
+
+ 
+%\item Derive the PDE if the potential has a Total-Variation norm,
+%\[
+%    H(\I(x,y)) = \int\int |\nabla_x \I(x,y)| + |\nabla_y \I(x,y)| dxdy.
+%\]
+
+\end{enumerate}
+
+{\em Remark: if we re-express the function $H$ in the Fourier form as we did in Qestion 1.3.  You can see the other way for minimizing $H$ in the Fourier domain. Actually, Fourier transform was first invented by Joseph Fourier in 1822   to solve the heat diffusion equations.  Read some background in wikipedia. In future lectures, we will see how we learn the potentials in general form and then derive system dynamics in general.}\\
+
+
+{\em  Variational Calculus: Suppose we are minimizing a functional with respect to
+a function $f(x)$
+\[  E(f(x)]  = \int L(f(x), \dot{f}(x))dx \]
+The Euler-Lagrange equation for the minimum is
+\[
+     \frac{\delta E}{\delta f} = \frac{\partial L}{\partial(f)} - \frac{d }{dx}(\frac{\partial L}{\partial \dot{f}}) =0
+\]
+You may find some on-line tutorial on the Euler-Lagrange equation, especially for $f(x)$ that  has multiple variables $x=(x_1, ...,x_n)$.
+In the above question, we treat the image $\I(x,y)$ as a continuous
+function and $H(\I)$ is a functional. In computer vision, the
+variational methods (PDEs) often switch to a continuous domain to
+derive the equations and then switch back to discrete lattice for
+implementation. }
+
+\newpage
+
+\noindent{\bf Question 3}  (A scale invariant world, 1.5 points).
+Consider a toy world which consists of only line segments. In an
+image, a line segment is represented by its center $(x_i,y_i)$,
+orientation $\theta_i$ and length $r_i$.  The line segments are
+independently distributed with uniform probability for their centers
+and orientations. The length follows a probability $p(r)$. We denote
+by $\lambda(a,b, A)$ the number of line segments with length $r\in
+[a,b]$ whose center falls inside an area $A$. Note that we assume
+the image is defined on a continuous 2D domain and the line segment
+has zero width (when you down scale the image, the width of the line
+does not change).
+
+When we scale the image by a factor $s$, then the line segment will
+ be scaled from length $r$ to $sr$.  Suppose that the image
+ ensemble is scale invariant, that is, at any scale $s$, within a
+ unit area, we always observe the same number (on average) of line
+ segments with length $r$.
+
+\begin{enumerate}
+\item Show that $\lambda(a,b,A) = 4\lambda(2a,2b,A)$. [Hint: by direct argument].
+
+\item Use the above equation, then show that for any interval $[a,b]$,
+\[
+     \int_a^b p(r)dr = s^2  \int_{sa}^{sb} p(r)dr.
+\]
+
+\item Set $a=a_o$ a constant, and $b=r$ a variable, from the above equation
+show $p(r)=s^3 p(sr)$, then $p(r)=\frac{c}{r^3}$.
+\end{enumerate}
+{\em Remark: This question proves that we will see a scale invariant
+world if the length of the line segments follows a distribution
+$C/r^3$! }
+%Suppose we ignore all line segments with $r\leq \epsilon$.
+
+\newpage
+
+\noindent{\bf Question 4}  (Lagrange Mechanics, Least Action Principle, And Newton's Laws, 2.5 points).
+
+First, we need to refresh our knowledge about Newton's laws which we learned in middle school. 
+Let's recall what do the Newton's Laws tell us (from Wiki):
+\begin{itemize}
+    \item First law: Every object perseveres in its state of rest, or of uniform motion in a right line, except insofar as it is compelled to change that state by forces impressed thereon.
+    \item Second Law: The change of motion of an object is proportional to the force impressed; and is made in the direction of the straight line in which the force is impressed.
+    \item Third Law: To every action, there is always opposed an equal reaction; or, the mutual actions of two bodies upon each other are always equal, and directed to contrary parts.
+\end{itemize}
+
+Now, we will try to start with Lagrange Mechanics and the least action principle to rebuild Newton's Laws.
+\begin{enumerate}
+    \item  \emph{First Law:} The first law of motion is typically discussed within the context of the Inertial Frame of reference. Some researchers even regard this law as a defining criterion for identifying the Inertial Frame. In this context, we define the Inertial Frame as one in which both time and space are homogeneous. Given the homogeneity of space, the Lagrangian for a free particle is solely a function of the magnitude of its velocity, expressed as $\vec{v}^2$:
+$$
+L = L(\vec{v}^2) = \frac{1}{2} m \vec{v}^2
+$$
+\textbf{Based on this, please prove the first law of motion, which states that:}
+$$
+\vec{v} = const
+$$
+
+
+    \item \emph{Second Law:} In Lagrange Mechanics, we define \textbf{force} as:
+    $$
+    F := - \frac{\partial V}{\partial \vec{r}}
+    $$
+    where $V$ is the potential function, $\vec{r}$ is the coordinate of the particle.
+    \textbf{Please prove the second law, which states that}:
+    $$
+    F = m \frac{d^2{\vec{r}}}{dt^2}
+    $$
+    or equivalently:
+    $$
+    F = m \frac{d \vec{v}}{dt}
+    $$
+
+    \item \emph{Third Law:} Now we are going from one particle to a set of particles, whose coordinates are depicted as $\vec{r}_1, \vec{r}_2, \ldots, \vec{r}_n$. We will first prove the conservation of momentum:
+    \begin{itemize}
+        \item Conservation of Momentum: By the homogeneity of space, we have under any small displacement, if the speed remains constant, the lagrangian remains unchanged. To be concrete:
+        $$
+        \delta L = \sum \limits_{i=1}^n \frac{\partial L}{\partial \vec{r}_i} \delta \vec{r}_i
+        $$
+        As the lagrangian remains constant for any small displacement, then we have:
+        $$
+        \sum \limits_{i=1}^n \frac{\partial L }{\partial \vec{r}_i} = 0
+        $$
+        If we define the momentum of a system as:
+        $$
+        \vec{P} := \sum \limits_{i=1}^n \frac{\partial L }{\partial \vec{v}_i}
+        $$
+        \textbf{Please prove that the momentum remains constant.}
+        
+        \item \textbf{Please prove the third law, which states mathematically:}
+        $$
+        \sum \limits_{i=1}^{n} m_i \frac{d\vec{v}_i}{dt} = 0
+        $$
+        
+    
+    \end{itemize}
+
+    \item \emph{Conservation of Energy: }
+    By the homogeneity of time, the lagrangian doesn't depend on time, which states mathematically that:
+    $$
+    \frac{dL}{dt} = 0
+    $$
+    \textbf{Please prove the conservation of energy:}
+    $$
+    \frac{1}{2} m \dot{\vec{r}}^2 + V(\vec{r}) = const
+    $$
+
+
+\end{enumerate}
+\end{document}
+
+
+\vspace{1.5cm}
+
+\vspace{1cm}
+\noindent{\bf Problem 4} Let $\I$ be an image defined on a lattice
+$\Lambda$, and $\Gamma=\{\ell_{s,t} \in \{0,1\}: \; \forall (s,t) \in
+C^2\}$ a layer of line process. For each pair clique $<s,t>$,
+ $\ell_{s,t}=1$ means $s$ and $t$ belong to two different
+objects and thus there is no potential energy between $s$ and $t$.
+ The line process model is
+\[
+ p(\I, \Gamma) =\frac{1}{Z} \exp\{ -\sum_{<s,t> \in C^2} \mu
+ (1-\ell_{s,t})(\I_s -\I_t)^2 + \nu \ell_{s,t}\}.
+\]
+As $\ell_{s,t}, <s,t>\in C^2$ are independent, we 'd like to compute
+the marginal distribution,
+\[
+     p(\I) = \sum_{\Gamma} p(\I, \Gamma) = \frac{1}{Z}
+     \exp\{-\sum_{<s,t>\in C^2} \psi(\I_s -\I_t) \}
+\]
+\begin{enumerate}
+
+\item Derive the potential function $\psi(x)$, and plot it.
+
+\item What is the limit $\lim_{x\rightarrow \infty} \psi(x)$?
+\end{enumerate}
